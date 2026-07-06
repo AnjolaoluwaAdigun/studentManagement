@@ -10,47 +10,47 @@ namespace StudentManagement.Managers.Implementations
 
         public Course CreateCourse(string title, string code, string description, int creditUnits, int instructorId)
         {
-            var existing = _courses.FirstOrDefault(c => c.Code == code);
+            var existing= GetCourse(code);
             if (existing != null)
             {
-                Console.WriteLine($"Course with code {code} already exists.");
+                Console.WriteLine("Course already exists!");
                 return existing;
+                
             }
-
-            var course = new Course(_nextId++, title, code, description, creditUnits, instructorId);
-            _courses.Add(course);
-            Console.WriteLine($"Course '{title}' ({code}) created.");
-            return course;
+            var newCourse= new Course(_nextId++,title,code,description,creditUnits,instructorId);
+            _courses.Add(newCourse);
+            Console.WriteLine($"{code} has been added");
+            return newCourse;
         }
-
         public void UpdateCourse(int courseId, string title, string description, int creditUnits)
         {
-            var course = GetCourse(courseId);
-            if (course == null)
+            var existing= GetCourse(courseId);
+            if (existing == null)
             {
-                Console.WriteLine("Course not found.");
+                Console.WriteLine("Course not found!");
                 return;
             }
-
-            course.Title = title;
-            course.Description = description;
-            course.CreditUnits = creditUnits;
-            Console.WriteLine("Course updated.");
+            existing.Title=title;
+            existing.Description=description;
+            existing.CreditUnits=creditUnits;
+            Console.WriteLine($"{courseId} has been updated");
         }
 
         public Course? GetCourse(int courseId)
+            {
+                return _courses.FirstOrDefault(c => c.Id == courseId);
+            }
+        public Course? GetCourse(string code)
         {
-            return _courses.FirstOrDefault(c => c.Id == courseId);
+            return _courses.FirstOrDefault(a=>a.Code==code);
         }
-
         public List<Course> GetAllCourses()
         {
             return _courses;
         }
-
         public List<Course> GetCoursesByInstructor(int instructorId)
         {
-            return _courses.Where(c => c.InstructorId == instructorId).ToList();
+            return _courses.FindAll(a=>a.InstructorId==instructorId);
         }
     }
 }

@@ -1,0 +1,13 @@
+# .NET build output
+bin/
+obj/
+
+# User/IDE files
+*.user
+.vs/
+.vscode/        # remove this line if you want to commit launch.json/tasks.json
+.idea/
+
+# OS clutter
+.DS_Store
+Thumbs.db

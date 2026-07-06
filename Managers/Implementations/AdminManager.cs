@@ -7,69 +7,78 @@ namespace StudentManagement.Managers.Implementations
 {
     public class AdminManager : IAdminManager
     {
-        private static int _nextAdminId = 1;
-        private static int _nextInstructorId = 1;
+        private static int _nextAdminId=1;
         private static List<User> _admins = new List<User>();
-        private static List<Instructor> _instructors = new List<Instructor>();
+
+        private static int _nextInstructorId=1;
+        private static List<Instructor> _instructors= new List<Instructor>();
 
         public AdminManager()
         {
-            if (_admins.Count == 0)
-            {
-                var defaultAdmin = new User(_nextAdminId++, "Super Admin", "admin@school.com", HashUtil.Hash("admin123"), Role.Admin);
+            if(_admins.Count==0){
+                var defaultAdmin= new User(_nextAdminId++,"Johanan", "Johanan@gmail.com", HashUtil.Hash("admin123"), Role.Admin);
                 _admins.Add(defaultAdmin);
+
             }
         }
 
-        public User CreateAdmin(string name, string email, string password)
+        public User CreateAdmin(string name,string email,string password)
         {
-            var existing = GetAdminByEmail(email);
+            var existing=GetAdminByEmail(email);
             if (existing != null)
             {
-                Console.WriteLine("An admin with that email already exists.");
+                Console.WriteLine("Admin already exists");
                 return existing;
             }
 
-            var admin = new User(_nextAdminId++, name, email, HashUtil.Hash(password), Role.Admin);
-            _admins.Add(admin);
-            Console.WriteLine($"Admin '{name}' created.");
-            return admin;
+            var newAdmins= new User(_nextAdminId++,name,email,HashUtil.Hash(password), Role.Admin);
+            _admins.Add(newAdmins);
+            Console.WriteLine($"{name} has been created.");
+            return newAdmins;
         }
-
         public Instructor CreateInstructor(string name, string email, string password, string department)
         {
-            var existing = GetInstructorByEmail(email);
-            if (existing != null)
+            var existing= GetInstructorByEmail(email);
+            if(existing != null)
             {
-                Console.WriteLine("An instructor with that email already exists.");
+                Console.WriteLine("Instructor already exists");
                 return existing;
             }
 
-            var instructor = new Instructor(_nextInstructorId++, name, email, HashUtil.Hash(password), department);
-            _instructors.Add(instructor);
-            Console.WriteLine($"Instructor '{name}' created.");
-            return instructor;
+            var newInstructor= new Instructor(_nextInstructorId++,name,email,HashUtil.Hash(password),department);
+            _instructors.Add(newInstructor);
+            Console.WriteLine($"{name} has been created.");
+            return newInstructor;
+            
         }
-
-        public void OfferAdmission(int studentId, bool admit, IStudentManager studentManager)
+        public  User? GetAdminByEmail(string email)
         {
-            var student = studentManager.GetStudent(studentId);
-            if (student == null)
-            {
-                Console.WriteLine("Student not found.");
-                return;
-            }
-
-            student.AdmissionStatus = admit ? AdmissionStatus.Admitted : AdmissionStatus.Rejected;
-            Console.WriteLine($"{student.Name} has been {(admit ? "admitted" : "rejected")}.");
+            return _admins.FirstOrDefault(a=>a.Email==email);
         }
-
-        public User? GetAdminByEmail(string email)
+        public Instructor? GetInstructorByEmail(string email)
         {
-            return _admins.FirstOrDefault(a => a.Email == email);
+            return _instructors.FirstOrDefault(a=>a.Email==email);
         }
 
-        public List<User> GetAllAdmins()
+        public Instructor? GetInstructor(int id)
+        {
+            return _instructors.FirstOrDefault(a=>a.Id==id);
+        }
+        public bool LoginAdmin(string email, string password, out User? admin)
+        {
+            admin=GetAdminByEmail(email);
+            if(admin==null) return false;
+            return HashUtil.Verify(password,admin.Password);
+        }
+
+        public bool LoginInstructor(string email, string password, out Instructor? instructor)
+        {
+            instructor=GetInstructorByEmail(email);
+            if(instructor== null) return false;
+            return HashUtil.Verify(password,instructor.Password);
+        }
+
+        public List<User>  GetAllAdmins()
         {
             return _admins;
         }
@@ -79,28 +88,22 @@ namespace StudentManagement.Managers.Implementations
             return _instructors;
         }
 
-        public Instructor? GetInstructor(int id)
+        public void OfferAdmission(int studentId, bool admit, IStudentManager studentManager)
         {
-            return _instructors.FirstOrDefault(i => i.Id == id);
+            var student= studentManager.GetStudent(studentId);
+            if (student == null)
+            {
+                Console.WriteLine("Student not found.");
+                return;
+            }
+           
+            
+        student.AdmissionStatus=admit? AdmissionStatus.Admitted: AdmissionStatus.Rejected;
+        Console.WriteLine($"{student.Name} you have been {(admit? "admitted": "rejected")}!");
+            
         }
 
-        public Instructor? GetInstructorByEmail(string email)
-        {
-            return _instructors.FirstOrDefault(i => i.Email == email);
-        }
-
-        public bool LoginAdmin(string email, string password, out User? admin)
-        {
-            admin = GetAdminByEmail(email);
-            if (admin == null) return false;
-            return HashUtil.Verify(password, admin.Password);
-        }
-
-        public bool LoginInstructor(string email, string password, out Instructor? instructor)
-        {
-            instructor = GetInstructorByEmail(email);
-            if (instructor == null) return false;
-            return HashUtil.Verify(password, instructor.Password);
-        }
     }
+
+
 }
